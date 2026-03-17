@@ -14,7 +14,7 @@ export default async function Home() {
   });
 
   // Map to the format BubbleFeed expects
-  const feedPosts = posts.map(post => ({
+  const feedPosts = posts.length > 0 ? posts.map(post => ({
     id: post.id,
     title: post.title,
     excerpt: post.excerpt,
@@ -26,7 +26,7 @@ export default async function Home() {
     }),
     contributorCount: post.contributorCount,
     wordCount: post.wordCount,
-  }));
+  })) : [];
 
   return (
     <div className="min-h-screen relative bg-canvas">
