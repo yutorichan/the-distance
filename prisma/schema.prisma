@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  avatarLetter String
+  posts        Post[]
+  proposals    Proposal[]
+}
+
+model Post {
+  id               String     @id @default(cuid())
+  title            String
+  excerpt          String
+  content          String
+  status           String     @default("writing") // "writing" or "completed"
+  authorId         String     
+  author           User       @relation(fields: [authorId], references: [id])
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  proposals        Proposal[]
+  contributorCount Int        @default(1)
+  wordCount        Int        @default(0)
+}
+
+model Proposal {
+  id             String    @id @default(cuid())
+  postId         String
+  post           Post      @relation(fields: [postId], references: [id])
+  authorId       String
+  author         User      @relation(fields: [authorId], references: [id])
+  proposalType   String    // "replace" | "insert"
+  targetContext  String
+  diffsJson      String    // Serialized array of { type: "unchanged"|"removed"|"added", text: string }
+  isAdopted      Boolean   @default(false)
+  upvotes        Int       @default(0)
+  createdAt      DateTime  @default(now())
+}
