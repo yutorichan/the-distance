@@ -26,6 +26,7 @@ export default function CollaborateClient({
   const [proposals, setProposals] = useState(initialProposals);
   const [baseText, setBaseText] = useState(initialBaseText);
   const [postStatus, setPostStatusLocal] = useState<"writing" | "completed">(initialPostStatus);
+  const [activeTab, setActiveTab] = useState<"base" | "proposals">("proposals");
 
   const setPostStatus = (status: "writing" | "completed") => {
     setPostStatusLocal(status);
@@ -229,11 +230,37 @@ export default function CollaborateClient({
         </div>
       </nav>
 
+      {/* Mobile Tab Switcher */}
+      <div className="lg:hidden flex border-b border-border/40 bg-surface">
+        <button
+          onClick={() => setActiveTab("base")}
+          className={`flex-1 py-3 text-xs font-sans font-bold tracking-wider uppercase transition-all ${
+            activeTab === "base" 
+              ? "text-accent border-b-2 border-accent bg-accent/5" 
+              : "text-ink-muted hover:bg-slate-50"
+          }`}
+        >
+          原文 (Base Text)
+        </button>
+        <button
+          onClick={() => setActiveTab("proposals")}
+          className={`flex-1 py-3 text-xs font-sans font-bold tracking-wider uppercase transition-all ${
+            activeTab === "proposals" 
+              ? "text-accent border-b-2 border-accent bg-accent/5" 
+              : "text-ink-muted hover:bg-slate-50"
+          }`}
+        >
+          提案一覧 ({proposals.length})
+        </button>
+      </div>
+
       {/* Split Layout */}
       <div className="flex-1 flex overflow-hidden lg:flex-row flex-col">
         
         {/* Left: Original Context */}
-        <div className="lg:w-1/2 border-r border-border/50 overflow-y-auto bg-canvas/30 p-8 lg:p-12 hidden lg:block relative">
+        <div className={`lg:w-1/2 border-r border-border/50 overflow-y-auto bg-canvas/30 p-8 lg:p-12 relative ${
+          activeTab === "base" ? "block" : "hidden lg:block"
+        }`}>
           <div className="max-w-xl mx-auto opacity-70 hover:opacity-100 transition-opacity duration-500">
             <h2 className="text-sm font-sans font-bold text-ink-muted mb-6 uppercase tracking-widest flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -312,7 +339,9 @@ export default function CollaborateClient({
         </div>
 
         {/* Right: Proposals Stream OR Editor */}
-        <div className="lg:w-1/2 overflow-y-auto bg-canvas/60 p-4 lg:p-8">
+        <div className={`lg:w-1/2 overflow-y-auto bg-canvas/60 p-4 lg:p-8 ${
+          activeTab === "proposals" || editorMode ? "block" : "hidden lg:block"
+        }`}>
           <div className="max-w-xl mx-auto py-4">
             
             {editorMode ? (
