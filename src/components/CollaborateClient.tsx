@@ -26,7 +26,7 @@ export default function CollaborateClient({
   const [proposals, setProposals] = useState(initialProposals);
   const [baseText, setBaseText] = useState(initialBaseText);
   const [postStatus, setPostStatusLocal] = useState<"writing" | "completed">(initialPostStatus);
-  const [activeTab, setActiveTab] = useState<"base" | "proposals">("proposals");
+  const [activeTab, setActiveTab] = useState<"base" | "proposals">("base");
 
   const setPostStatus = (status: "writing" | "completed") => {
     setPostStatusLocal(status);
@@ -138,7 +138,20 @@ export default function CollaborateClient({
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    
+    // Better mobile selection support
+    const handleSelectionChange = () => {
+      const sel = window.getSelection();
+      if (sel && sel.isCollapsed && selection) {
+        setSelection(null);
+      }
+    };
+    document.addEventListener("selectionchange", handleSelectionChange);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("selectionchange", handleSelectionChange);
+    };
   }, [selection]);
 
   const startReplaceProposal = () => {
@@ -301,7 +314,7 @@ export default function CollaborateClient({
                   
                   {/* Floating Action Button for insertion */}
                   {postStatus === "writing" && (
-                    <div className="absolute top-1/2 right-0 -translate-y-1/2 opacity-0 group-hover/paragraph:opacity-100 transition-opacity duration-200">
+                    <div className="absolute top-1/2 right-0 -translate-y-1/2 lg:opacity-0 lg:group-hover/paragraph:opacity-100 transition-opacity duration-200">
                       <button
                         onClick={() => startInsertProposal(p)}
                         className="w-8 h-8 rounded-full bg-surface border border-border/80 shadow-sm flex items-center justify-center text-ink-muted hover:text-accent hover:border-accent/40 hover:bg-accent/5 transition-all"
